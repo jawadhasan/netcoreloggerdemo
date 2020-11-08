@@ -26,7 +26,7 @@ namespace NetCoreLogger.Web.CoreLogger
             foreach (var key in context.RouteData.Values?.Keys)
                 dict.Add($"RouteData-{key}", (string)context.RouteData.Values[key]);
 
-            var details = WebHelper.GetWebFlogDetail(_product, _layer, activity, context.HttpContext, dict);
+            var details = WebHelper.GetWebLogDetail(_product, _layer, activity, context.HttpContext, dict);
             _tracker = new PerfTracker(details);
 
         }

@@ -10,10 +10,22 @@ namespace NetCoreLogger.Web.CoreLogger
 {
     public static class WebHelper
     {
+
+        public static void LogWebError(string product, string layer, Exception ex, HttpContext context)
+        {
+            var details = GetWebLogDetail(product, layer, null, context, null);
+            details.Exception = ex;
+
+            AppLogger.WriteError(details);
+        }
+
+
+        #region code
+
         public static void LogWebUsage(string product, string layer, string activityName, HttpContext context,
             Dictionary<string, object> additionalInfo = null)
         {
-            var details = GetWebFlogDetail(product, layer, activityName, context, additionalInfo);
+            var details = GetWebLogDetail(product, layer, activityName, context, additionalInfo);
             AppLogger.WriteUsage(details);
         }
 
@@ -21,20 +33,15 @@ namespace NetCoreLogger.Web.CoreLogger
         public static void LogWebDiagnostic(string product, string layer, string message, HttpContext context,
             Dictionary<string, object> diagnosticInfo = null)
         {
-            var details = GetWebFlogDetail(product, layer, message, context, diagnosticInfo);
+            var details = GetWebLogDetail(product, layer, message, context, diagnosticInfo);
             AppLogger.WriteDiagnostic(details);
         }
 
-        public static void LogWebError(string product, string layer, Exception ex, HttpContext context)
-        {
-            var details = GetWebFlogDetail(product, layer, null, context, null);
-            details.Exception = ex;
 
-            AppLogger.WriteError(details);
-        }
+        #endregion
 
 
-        public static LogDetail GetWebFlogDetail(string product, string layer, string activityName,
+        public static LogDetail GetWebLogDetail(string product, string layer, string activityName,
             HttpContext context, Dictionary<string, object> additionalInfo = null)
         {
             var detail = new LogDetail()
@@ -53,25 +60,6 @@ namespace NetCoreLogger.Web.CoreLogger
             // Cookie data??
 
             return detail;
-        }
-
-        private static void GetRequestData(LogDetail detail, HttpContext context)
-        {
-            var request = context.Request;
-            if (request != null)
-            {
-                detail.Location = request.Path;
-
-                detail.AdditionalInfo.Add("UserAgent", request.Headers["User-Agent"]);
-                // non en-US preferences here??
-                detail.AdditionalInfo.Add("Languages", request.Headers["Accept-Language"]);
-
-                var qdict = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request.QueryString.ToString());
-                foreach (var key in qdict.Keys)
-                {
-                    detail.AdditionalInfo.Add($"QueryString-{key}", qdict[key]);
-                }
-            }
         }
 
         private static void GetUserData(LogDetail detail, HttpContext context)
@@ -98,5 +86,25 @@ namespace NetCoreLogger.Web.CoreLogger
             detail.UserId = userId;
             detail.UserName = userName;
         }
+        private static void GetRequestData(LogDetail detail, HttpContext context)
+        {
+            var request = context.Request;
+            if (request != null)
+            {
+                detail.Location = request.Path;
+
+                detail.AdditionalInfo.Add("UserAgent", request.Headers["User-Agent"]);
+                // non en-US preferences here??
+                detail.AdditionalInfo.Add("Languages", request.Headers["Accept-Language"]);
+
+                var qdict = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request.QueryString.ToString());
+                foreach (var key in qdict.Keys)
+                {
+                    detail.AdditionalInfo.Add($"QueryString-{key}", qdict[key]);
+                }
+            }
+        }
+
+ 
     }
 }
