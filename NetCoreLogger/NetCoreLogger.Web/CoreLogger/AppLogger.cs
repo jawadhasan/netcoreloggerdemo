@@ -18,18 +18,30 @@ namespace NetCoreLogger.Web.CoreLogger
         {
             _perfLogger = new LoggerConfiguration()
                 .WriteTo.File(path: Environment.GetEnvironmentVariable("LOGFILE_PERF"))
+                .WriteTo.Elasticsearch("http://localhost:9200",
+                    indexFormat: "perf-{0:yyyy.MM.dd}",
+                    inlineFields: true)
                 .CreateLogger();
 
             _usageLogger = new LoggerConfiguration()
                  .WriteTo.File(path: Environment.GetEnvironmentVariable("LOGFILE_USAGE"))
+                 .WriteTo.Elasticsearch("http://localhost:9200",
+                     indexFormat: "usage-{0:yyyy.MM.dd}",
+                     inlineFields: true)
                  .CreateLogger();
 
             _errorLogger = new LoggerConfiguration()
                  .WriteTo.File(path: Environment.GetEnvironmentVariable("LOGFILE_ERROR"))
+                 .WriteTo.Elasticsearch("http://localhost:9200",
+                     indexFormat: "error-{0:yyyy.MM.dd}",
+                     inlineFields: true)
                  .CreateLogger();
 
             _diagnosticLogger = new LoggerConfiguration()
                  .WriteTo.File(path: Environment.GetEnvironmentVariable("LOGFILE_DIAG"))
+                 .WriteTo.Elasticsearch("http://localhost:9200",
+                     indexFormat: "diag-{0:yyyy.MM.dd}",
+                     inlineFields: true)
                 .CreateLogger();
         }
 
